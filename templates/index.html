@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<!--
+  templates/index.html
+  Landing page: The Ultimate US Personal Finance & Budget Dashboard
+  Brand: Naa Bee Shop
+
+  Variables expected from Flask (see the app.py snippet in the notes):
+    maketou_url  -> your MyMaketou checkout URL (required)
+    site_url     -> your public domain, no trailing slash, e.g. https://naabeeshop.onrender.com (recommended)
+-->
+{% set site_url = site_url | default('https://YOUR-DOMAIN.com') %}
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- ===== SEO ===== -->
+  <title>Budget Spreadsheet for Google Sheets | Debt Payoff &amp; Savings Dashboard | Naa Bee Shop</title>
+  <meta name="description" content="The Ultimate US Personal Finance &amp; Budget Dashboard: a Google Sheets template with a monthly budget, Debt Snowball &amp; Avalanche tracker, savings goals and net worth. $9.99, instant download, no monthly fees.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{{ site_url }}/">
+  <meta name="theme-color" content="#10302F">
+
+  <!-- ===== Open Graph / Twitter (link previews) ===== -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Naa Bee Shop">
+  <meta property="og:title" content="The Ultimate US Personal Finance &amp; Budget Dashboard (Google Sheets)">
+  <meta property="og:description" content="Budget, pay off debt, build savings and track net worth in one Google Sheet. $9.99, instant download.">
+  <meta property="og:url" content="{{ site_url }}/">
+  <!-- Put a 1200x630 image at static/og-image.png -->
+  <meta property="og:image" content="{{ site_url }}/static/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- ===== Fonts (fallbacks keep the page fast and readable if they fail) ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- ===== Structured data: Product (digital, USD, in stock) ===== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "The Ultimate US Personal Finance & Budget Dashboard (Google Sheets Template)",
+    "description": "A Google Sheets budget template for the US market with a dashboard, monthly budget planner, Debt Snowball and Debt Avalanche tracker, savings and emergency fund goals, and net worth tracker. Instant digital download. Works on mobile and PC.",
+    "image": {{ (site_url ~ '/static/og-image.png') | tojson }},
+    "sku": "NBS-US-BUDGET-DASH",
+    "category": "Digital Product > Spreadsheet Templates > Personal Finance",
+    "brand": { "@type": "Brand", "name": "Naa Bee Shop" },
+    "offers": {
+      "@type": "Offer",
+      "url": {{ maketou_url | tojson }},
+      "price": "9.99",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
+      "priceValidUntil": "2027-12-31",
+      "seller": { "@type": "Organization", "name": "Naa Bee Shop" }
+    }
+  }
+  </script>
+
+  <!-- ===== Structured data: FAQ (matches the visible FAQ below) ===== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Do I need to pay for Google Sheets?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. Google Sheets is free with a Google account. You make your own copy of the template in your Google Drive." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on my phone?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Use the free Google Sheets app on iPhone or Android, or open it in any browser on a laptop, tablet or Chromebook." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it connect to my bank account?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. You enter your own transactions, so your financial data stays private in your own Google Drive." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I change the categories?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Rename, add or remove categories and accounts on the Settings tab." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    /* ===== Design tokens ===== */
+    :root{
+      --ink:#10302F;        /* deep green-teal: headings, dark sections */
+      --text:#2B3A3A;       /* body text */
+      --muted:#5B6B6B;      /* secondary text */
+      --paper:#FBFCFA;      /* page background */
+      --mint:#E7F3EC;       /* soft highlight background */
+      --line:#D5E2DA;       /* borders and dividers */
+      --leaf:#17794E;       /* primary action (white text passes AA contrast) */
+      --leaf-dark:#0F5E3B;  /* hover state */
+      --amber:#C9822B;      /* "close to limit" in the preview */
+      --coral:#C4553F;      /* "over budget" in the preview */
+      --radius:10px;
+      --head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+      --body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+    }
+
+    /* ===== Base ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--text);font-family:var(--body);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+    img,svg{max-width:100%}
+    h1,h2,h3{font-family:var(--head);color:var(--ink);line-height:1.15;margin:0 0 .6em}
+    h1{font-size:clamp(2.1rem,5.2vw,3.5rem);font-weight:800;letter-spacing:-.02em}
+    h2{font-size:clamp(1.6rem,3.4vw,2.3rem);font-weight:800;letter-spacing:-.01em}
+    h3{font-size:1.2rem;font-weight:600}
+    p{margin:0 0 1em}
+    a{color:var(--leaf)}
+    .wrap{width:min(1120px,100% - 2.5rem);margin-inline:auto}
+    .section{padding:clamp(3rem,7vw,5.5rem) 0}
+    .lead{font-size:1.2rem;color:var(--muted);max-width:34em}
+    :focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:4px}
+    .skip{position:absolute;left:-999px;top:0;background:var(--ink);color:#fff;padding:.6rem 1rem;z-index:100}
+    .skip:focus{left:0}
+
+    /* ===== Buttons ===== */
+    .btn{display:inline-block;background:var(--leaf);color:#fff;font-weight:600;font-size:1.1rem;text-decoration:none;padding:.95rem 1.6rem;border-radius:var(--radius);transition:background .15s}
+    .btn:hover{background:var(--leaf-dark)}
+    .btn-light{background:#fff;color:var(--ink)}
+    .btn-light:hover{background:var(--mint)}
+    .price-note{display:block;margin-top:.6rem;font-size:.95rem;color:var(--muted)}
+
+    /* ===== Header ===== */
+    .site-header{border-bottom:1px solid var(--line);background:var(--paper)}
+    .site-header .wrap{display:flex;justify-content:space-between;align-items:center;padding:.9rem 0}
+    .brand{font-family:var(--head);font-weight:800;color:var(--ink);text-decoration:none;font-size:1.15rem}
+    .site-header .btn{padding:.55rem 1.1rem;font-size:.98rem}
+
+    /* ===== Hero ===== */
+    .hero{padding:clamp(2.5rem,6vw,4.5rem) 0 clamp(3rem,6vw,5rem)}
+    .hero .wrap{display:grid;gap:3rem;grid-template-columns:1fr;align-items:center}
+    @media(min-width:900px){.hero .wrap{grid-template-columns:1.05fr .95fr}}
+    .hero .actions{margin-top:1.8rem}
+    .trust{list-style:none;padding:0;margin:1.8rem 0 0;display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;font-size:.98rem;color:var(--ink);font-weight:500}
+    .trust li{display:flex;align-items:center;gap:.45rem}
+    .trust svg{width:18px;height:18px;flex:none;color:var(--leaf)}
+
+    /* ===== Dashboard preview (pure CSS illustration of the Dashboard tab) ===== */
+    .preview{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -22px rgba(16,48,47,.45);padding:1.25rem}
+    .preview-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem;font-size:.92rem;color:var(--muted)}
+    .preview-top strong{font-family:var(--head);color:var(--ink);font-size:1.05rem}
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1.2rem}
+    .kpi{background:var(--mint);border-radius:8px;padding:.7rem .75rem}
+    .kpi small{display:block;color:var(--muted);font-size:.78rem}
+    .kpi b{font-family:var(--head);color:var(--ink);font-size:1.15rem}
+    .bars{display:grid;gap:.85rem}
+    .bar-row{display:grid;grid-template-columns:7.5rem 1fr 3rem;gap:.7rem;align-items:center;font-size:.88rem}
+    .bar-row span:last-child{text-align:right;color:var(--muted)}
+    .track{height:10px;background:#EAF0EC;border-radius:99px;overflow:hidden}
+    .fill{display:block;height:100%;border-radius:99px;background:var(--leaf);width:var(--w);transform-origin:left;animation:grow 1.1s .25s ease-out both}
+    .fill.warn{background:var(--amber)}
+    .fill.over{background:var(--coral)}
+    .preview-foot{margin-top:1.2rem;padding-top:.9rem;border-top:1px dashed var(--line);display:flex;justify-content:space-between;font-size:.9rem}
+    .preview-foot b{color:var(--ink)}
+    .caption{margin:.8rem 0 0;font-size:.85rem;color:var(--muted);text-align:center}
+    /* One-time load animation; disabled for users who prefer reduced motion */
+    @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    @media(prefers-reduced-motion:reduce){.fill{animation:none}html{scroll-behavior:auto}}
+    @media(max-width:420px){.bar-row{grid-template-columns:6rem 1fr 2.6rem}}
+
+    /* ===== Pain points ===== */
+    .pain{background:var(--mint)}
+    .pain-grid{display:grid;gap:2rem;grid-template-columns:1fr}
+    @media(min-width:800px){.pain-grid{grid-template-columns:1fr 1.2fr;align-items:start}}
+    .pain ul{margin:0;padding-left:1.2rem}
+    .pain li{margin-bottom:.7rem}
+
+    /* ===== Modules (list rows with dividers, not identical cards) ===== */
+    .modules{margin-top:2rem;border-top:1px solid var(--line)}
+    .module{display:grid;gap:.5rem 2rem;grid-template-columns:1fr;padding:1.5rem 0;border-bottom:1px solid var(--line)}
+    @media(min-width:800px){.module{grid-template-columns:16rem 1fr}}
+    .module h3{margin:0}
+    .module p{margin:0;color:var(--muted)}
+    .module ul{margin:.6rem 0 0;padding-left:1.1rem;color:var(--text)}
+
+    /* ===== How it works (a real sequence, so numbering is meaningful) ===== */
+    .steps{list-style:none;counter-reset:step;margin:2rem 0 0;padding:0;display:grid;gap:1.5rem}
+    @media(min-width:800px){.steps{grid-template-columns:repeat(3,1fr)}}
+    .steps li{counter-increment:step;padding-left:3.2rem;position:relative}
+    .steps li::before{content:counter(step);position:absolute;left:0;top:0;width:2.3rem;height:2.3rem;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--head);font-weight:800;display:grid;place-items:center}
+    .steps h3{margin-bottom:.25em}
+    .steps p{color:var(--muted);margin:0}
+
+    /* ===== Audience + included ===== */
+    .two-col{display:grid;gap:2.5rem;grid-template-columns:1fr}
+    @media(min-width:800px){.two-col{grid-template-columns:1fr 1fr}}
+    .checklist{list-style:none;padding:0;margin:0}
+    .checklist li{padding:.55rem 0 .55rem 1.9rem;position:relative;border-bottom:1px solid var(--line)}
+    .checklist li::before{content:"";position:absolute;left:.2rem;top:1.05rem;width:.55rem;height:.9rem;border:solid var(--leaf);border-width:0 2.5px 2.5px 0;transform:translateY(-50%) rotate(45deg)}
+
+    /* ===== FAQ (native details/summary: no JavaScript needed) ===== */
+    .faq{max-width:46rem}
+    details{border-bottom:1px solid var(--line);padding:1rem 0}
+    summary{cursor:pointer;font-weight:600;color:var(--ink);list-style:none;display:flex;justify-content:space-between;gap:1rem}
+    summary::-webkit-details-marker{display:none}
+    summary::after{content:"+";font-size:1.4rem;line-height:1;color:var(--leaf)}
+    details[open] summary::after{content:"\2212"}
+    details p{margin:.7rem 0 0;color:var(--muted)}
+
+    /* ===== Final call to action ===== */
+    .final{background:var(--ink);color:#DCEBE3;text-align:center}
+    .final h2{color:#fff}
+    .final p{max-width:34em;margin-inline:auto}
+    .final .price{font-family:var(--head);font-size:3rem;font-weight:800;color:#fff;margin:.4rem 0 1rem;display:block}
+    .final .price-note{color:#B9D3C6}
+
+    /* ===== Footer ===== */
+    .site-footer{padding:2rem 0 5.5rem;font-size:.9rem;color:var(--muted)}
+    .site-footer p{margin:0 0 .6rem;max-width:52rem}
+
+    /* ===== Sticky mobile buy bar (phones only) ===== */
+    .sticky{display:none}
+    @media(max-width:720px){
+      .sticky{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;justify-content:space-between;align-items:center;gap:1rem;padding:.7rem 1.1rem;background:#fff;border-top:1px solid var(--line)}
+      .sticky b{font-family:var(--head);color:var(--ink);font-size:1.15rem}
+      .sticky .btn{padding:.7rem 1.2rem;font-size:1rem}
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- ===== Header ===== -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">Naa Bee Shop</a>
+      <a class="btn" href="{{ maketou_url }}" rel="noopener">Get it for $9.99</a>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <h1>Know where every dollar goes, and finally pay down your debt.</h1>
+          <p class="lead">A Google Sheets budget dashboard built for US life: rent, student loans, credit cards, gas, groceries and subscriptions. Type in your numbers. The sheet does the math.</p>
+
+          <div class="actions">
+            <!-- PRIMARY CTA: links to your MyMaketou checkout -->
+            <a class="btn" href="{{ maketou_url }}" rel="noopener">Get the dashboard for $9.99</a>
+            <span class="price-note">One-time payment. Instant download. No subscription.</span>
+          </div>
+
+          <!-- Trust badges -->
+          <ul class="trust" aria-label="Key benefits">
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12"/></svg>Instant download</li>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M7 7l6 6M13 7l-6 6"/></svg>No monthly fees</li>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="6" y="2" width="8" height="16" rx="2"/><path d="M9 15h2"/></svg>Works on mobile &amp; PC</li>
+            <li><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="12" height="16" rx="1.5"/><path d="M7 7h6M7 11h6M7 15h3"/></svg>Google Sheets</li>
+          </ul>
+        </div>
+
+        <!-- Illustration of the Dashboard tab (decorative, hidden from screen readers) -->
+        <div>
+          <div class="preview" aria-hidden="true">
+            <div class="preview-top"><strong>October budget</strong><span>Dashboard tab</span></div>
+            <div class="kpis">
+              <div class="kpi"><small>Income</small><b>$4,200</b></div>
+              <div class="kpi"><small>Expenses</small><b>$3,150</b></div>
+              <div class="kpi"><small>Net savings</small><b>$1,050</b></div>
+            </div>
+            <div class="bars">
+              <div class="bar-row"><span>Rent</span><span class="track"><i class="fill" style="--w:100%"></i></span><span>100%</span></div>
+              <div class="bar-row"><span>Groceries</span><span class="track"><i class="fill warn" style="--w:88%"></i></span><span>88%</span></div>
+              <div class="bar-row"><span>Gas</span><span class="track"><i class="fill" style="--w:54%"></i></span><span>54%</span></div>
+              <div class="bar-row"><span>Dining out</span><span class="track"><i class="fill over" style="--w:100%"></i></span><span>118%</span></div>
+              <div class="bar-row"><span>Subscriptions</span><span class="track"><i class="fill" style="--w:62%"></i></span><span>62%</span></div>
+            </div>
+            <div class="preview-foot"><span>Left to budget: <b>$0.00</b></span><span>Debt-free in <b>26 months</b></span></div>
+          </div>
+          <p class="caption">Illustration with sample numbers. Bars turn amber near your limit and red when you go over.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Pain points ===== -->
+    <section class="section pain">
+      <div class="wrap pain-grid">
+        <div>
+          <h2>Payday comes, and the money is gone by the 20th.</h2>
+        </div>
+        <div>
+          <p>It usually isn't an income problem. It's a visibility problem. When your spending lives across three bank apps, two credit cards and a handful of subscriptions, it's hard to see what's happening until the balance is low.</p>
+          <ul>
+            <li>You live paycheck to paycheck and can't say where it went.</li>
+            <li>Credit card balances keep growing, and you're not sure which to pay first.</li>
+            <li>You'd like an emergency fund, but there's never anything left to move.</li>
+            <li>Freelance income changes month to month, so planning feels like guessing.</li>
+          </ul>
+          <p>One sheet that shows income, spending, debt and savings together makes the next decision obvious.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== The 4 main modules ===== -->
+    <section class="section" id="modules">
+      <div class="wrap">
+        <h2>Four tools in one Google Sheet</h2>
+        <p class="lead">Everything updates on its own once you log a transaction.</p>
+
+        <div class="modules">
+          <div class="module">
+            <h3>Monthly Budget Planner</h3>
+            <div>
+              <p>Plan income against expenses for every US category, from rent or mortgage to Netflix and Spotify.</p>
+              <ul>
+                <li>Color-coded progress bars for each category</li>
+                <li>"Left to budget" check so every dollar has a job</li>
+                <li>Summary dashboard with income, expenses, savings rate</li>
+              </ul>
+            </div>
+          </div>
+          <div class="module">
+            <h3>Debt Snowball &amp; Avalanche Tracker</h3>
+            <div>
+              <p>List your credit cards, student loans and car loan, then pick your method.</p>
+              <ul>
+                <li>Snowball: smallest balance first, for quick wins</li>
+                <li>Avalanche: highest APR first, to save on interest</li>
+                <li>See your payoff order and estimated debt-free date</li>
+              </ul>
+            </div>
+          </div>
+          <div class="module">
+            <h3>Savings &amp; Emergency Fund Goals</h3>
+            <div>
+              <p>Set a 3 to 12 month emergency fund target and add goals like a vacation, a car or a down payment.</p>
+              <ul>
+                <li>Shows how much to save each month to hit your date</li>
+                <li>Progress bars for every goal</li>
+              </ul>
+            </div>
+          </div>
+          <div class="module">
+            <h3>Net Worth Tracker</h3>
+            <div>
+              <p>Add your assets and what you owe. Your net worth is calculated for you, so you can watch it grow month after month.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== How it works ===== -->
+    <section class="section" style="padding-top:0">
+      <div class="wrap">
+        <h2>Set up in about 20 minutes</h2>
+        <ol class="steps">
+          <li>
+            <h3>Buy and download</h3>
+            <p>You get a PDF with your Google Sheets link right after checkout.</p>
+          </li>
+          <li>
+            <h3>Make your copy</h3>
+            <p>Click "Make a copy" to save it to your own Google Drive. It's private to you.</p>
+          </li>
+          <li>
+            <h3>Start tracking</h3>
+            <p>Enter your budget, log transactions in about two minutes a day, and watch the dashboard update.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== Who it's for / What's included ===== -->
+    <section class="section pain">
+      <div class="wrap two-col">
+        <div>
+          <h2>Made for</h2>
+          <ul class="checklist">
+            <li>Young adults and recent grads building their first budget</li>
+            <li>Freelancers and gig workers with irregular income</li>
+            <li>Anyone paying off credit cards or student loans</li>
+            <li>Couples and families who want one shared view of money</li>
+          </ul>
+        </div>
+        <div>
+          <h2>What you get</h2>
+          <ul class="checklist">
+            <li>Google Sheets dashboard with 8 organized tabs</li>
+            <li>US expense categories you can rename and extend</li>
+            <li>Step-by-step PDF quick-start guide</li>
+            <li>Freelancer tax set-aside helper</li>
+            <li>Yours to keep: pay once, use it for years</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="section" id="faq">
+      <div class="wrap">
+        <h2>Questions, answered</h2>
+        <div class="faq">
+          <details>
+            <summary>Do I need to pay for Google Sheets?</summary>
+            <p>No. Google Sheets is free with a Google account. You make your own copy of the template in your Google Drive.</p>
+          </details>
+          <details>
+            <summary>Does it work on my phone?</summary>
+            <p>Yes. Use the free Google Sheets app on iPhone or Android, or open it in any browser on a laptop, tablet or Chromebook.</p>
+          </details>
+          <details>
+            <summary>Does it connect to my bank account?</summary>
+            <p>No. You enter your own transactions, so your financial data stays private in your own Google Drive.</p>
+          </details>
+          <details>
+            <summary>Can I change the categories?</summary>
+            <p>Yes. Rename, add or remove categories and accounts on the Settings tab.</p>
+          </details>
+          <details>
+            <summary>Will it work in Excel?</summary>
+            <p>It is designed for Google Sheets. Some features, like the progress bars, will not behave the same way in Excel.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Final CTA ===== -->
+    <section class="section final">
+      <div class="wrap">
+        <h2>Give every dollar a job this month.</h2>
+        <p>Pay once and keep it. No subscription, no bank login, nothing to install.</p>
+        <span class="price">$9.99</span>
+        <a class="btn btn-light" href="{{ maketou_url }}" rel="noopener">Get the dashboard</a>
+        <span class="price-note">Instant download after checkout</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>&copy; {{ now_year | default('2026') }} Naa Bee Shop. All rights reserved.</p>
+      <p>This is a digital product. No physical item will be shipped. Google Sheets is a trademark of Google LLC; this product is not affiliated with or endorsed by Google.</p>
+      <p>The dashboard is an educational budgeting tool and does not provide financial, tax or legal advice.</p>
+      <!-- TODO: add your support email and your refund policy wording here -->
+    </div>
+  </footer>
+
+  <!-- Sticky buy bar: appears on phones only -->
+  <div class="sticky">
+    <b>$9.99</b>
+    <a class="btn" href="{{ maketou_url }}" rel="noopener">Get the dashboard</a>
+  </div>
+</body>
+</html>
