@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xml
+  1. Replace https://YOUR-DOMAIN.com with your real public URL (no trailing slash issues: keep the final "/").
+  2. Serve it at /sitemap.xml (see the Flask route in the notes).
+  3. Submit https://YOUR-DOMAIN.com/sitemap.xml in Google Search Console.
+  4. Update <lastmod> when you make significant changes to the page.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://YOUR-DOMAIN.com/</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
